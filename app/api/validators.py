@@ -59,8 +59,8 @@ async def check_charity_project_before_edit(
     или если указанная новая сумма меньше той, что уже была вложена.
 
     Параметры:
-        1) charity_project (CharityProject): Проект, который требуется изменить;
-        2) update_data (CharityProjectUpdate): Новые данные для обновления проекта.
+        1) charity_project: Проект, который требуется изменить;
+        2) update_data: Новые данные для обновления проекта.
     """
     if charity_project.fully_invested:
         raise HTTPException(
@@ -71,7 +71,8 @@ async def check_charity_project_before_edit(
        update_data.full_amount < charity_project.invested_amount):
         raise HTTPException(
             status_code=422,
-            detail='Запрошенная сумма не должна быть меньше внесённых средств!'
+            detail='Запрошенная сумма не должна быть'
+                    'меньше внесённых средств!'
         )
 
 
@@ -84,7 +85,7 @@ async def check_charity_project_is_not_invested_or_closed(
     или если в него уже внесены какие-либо средства.
 
     Параметры:
-        1) charity_project (CharityProject): Проект, который планируется удалить.
+        1) charity_project (CharityProject): Проект, который думают удалить.
     """
     if charity_project.invested_amount:
         raise HTTPException(

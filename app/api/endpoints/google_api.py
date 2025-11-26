@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
-from app.core.constants import URL_GOOGLE_SHEETS
+# from app.core.constants import URL_GOOGLE_SHEETS
 from app.core.google_client import get_service
 from app.core.user import current_superuser
 from app.crud.charity_project import charity_project_crud
@@ -34,4 +34,7 @@ async def get_project_report(
     await spreadsheets_update_value(spreadsheet_id,
                                     projects,
                                     wrapper_services)
-    return {'Google Sheet URL': f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}'}
+    return {
+        'Google Sheet URL': 
+        f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}'
+    }

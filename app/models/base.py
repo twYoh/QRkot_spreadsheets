@@ -7,7 +7,10 @@ from app.core.constants import DEFAULT_VALUE
 
 
 class FinanceBaseModel(Base):
-    """Базовая абстрактная модель, используемая как основа для проектов и пожертвований."""
+    """
+    Базовая абстрактная модель,
+    используемая как основа для проектов и пожертвований.
+    """
     __abstract__ = True
     full_amount = Column(Integer, nullable=False)
     invested_amount = Column(Integer, default=DEFAULT_VALUE)
