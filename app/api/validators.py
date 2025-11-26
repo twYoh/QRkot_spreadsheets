@@ -71,8 +71,10 @@ async def check_charity_project_before_edit(
        update_data.full_amount < charity_project.invested_amount):
         raise HTTPException(
             status_code=422,
-            detail='Запрошенная сумма не должна быть'
-                    'меньше внесённых средств!'
+            detail=(
+                'Запрошенная сумма не должна быть '
+                'меньше внесённых средств!'
+            ),
         )
 
 
@@ -90,8 +92,10 @@ async def check_charity_project_is_not_invested_or_closed(
     if charity_project.invested_amount:
         raise HTTPException(
             status_code=400,
-            detail='Проект нельзя удалить,'
-                    'так как в него были сделаны взносы!'
+            detail=(
+                'Проект нельзя удалить, '
+                'так как в него были сделаны взносы!'
+            ),
         )
     if charity_project.fully_invested:
         raise HTTPException(
