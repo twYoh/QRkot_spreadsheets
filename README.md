@@ -46,30 +46,51 @@ pydantic и Google API.
 ## Как развернуть проект локально
 
 1.  Клонировать репозиторий и перейти в директорию проекта:
-    `git clone https://github.com/twYoh/QRkot_spreadsheets.git`
+    ```bash
+    git clone https://github.com/twYoh/QRkot_spreadsheets.git
+    ```
 
 2.  Создать и активировать виртуальное окружение:
-    `python -m venv venv` 
+    ```bash
+    python -m venv venv
+    ```
     Для Linux/macOS:
-    `source venv/bin/activate` 
+    ```bash
+    source venv/bin/activate
+    ```
     Для Windows:
-    `source venv/Scripts/activate`
+    ```bash
+    source venv/Scripts/activate
+    ```
 
 3.  Установить зависимости:
-    `python -m pip install --upgrade pip`
-    `pip install -r requirements.txt`
+    ```bash
+    python -m pip install --upgrade pip
+    ```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 4.  Создать файл `.env` с параметрами окружения, например:
-    `DATABASE_URL=sqlite+aiosqlite:///./fastapi.db`
-    `SECRET=secretpassword`
+    ```bash
+    DATABASE_URL=sqlite+aiosqlite:///./fastapi.db
+    ```
+    ```bash
+    SECRET=secretpassword
+    ```
 
 5.  Выполнить миграции базы данных: 
-    `alembic upgrade head` 
+    ```bash
+    alembic upgrade head
+    ```
     или:
-    `alembic upgrade ID` где `ID` - идентификатор
+    ```bash
+    alembic upgrade ID
+    ```
+    где `ID` - идентификатор
     миграции.
 
-6.  Запустить приложение: `uvicorn app.main:app`
+6.  Запустить приложение: ```bash uvicorn app.main:app```
 
 ## Формирование отчёта в Google Sheets
 
