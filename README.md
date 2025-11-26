@@ -90,7 +90,10 @@ pydantic и Google API.
     где `ID` - идентификатор
     миграции.
 
-6.  Запустить приложение: ```bash uvicorn app.main:app```
+6.  Запустить приложение: 
+    ```bash
+    uvicorn app.main:app
+    ```
 
 ## Формирование отчёта в Google Sheets
 
