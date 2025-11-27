@@ -19,7 +19,6 @@ class CharityProjectBase(BaseModel):
 
 class CharityProjectUpdate(CharityProjectBase):
     """Схема для частичного обновления данных благотворительного проекта."""
-    pass
 
 
 class CharityProjectCreate(CharityProjectUpdate):

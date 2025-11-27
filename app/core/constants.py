@@ -5,7 +5,7 @@ from app.core.config import settings
 MAX_LENGTH = 100
 MIN_LENGTH = 1
 DEFAULT_VALUE = 0
-FORMAT = "%Y/%m/%d %H:%M:%S"
+FORMAT = '%Y/%m/%d %H:%M:%S'
 NOW_DATE_TIME = datetime.now().strftime(FORMAT)
 URL_GOOGLE_SHEETS = 'https://docs.google.com/spreadsheets/d/'
 

@@ -39,7 +39,7 @@ async def convert_seconds_to_dhms(seconds: int) -> str:
 
 async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
     """Заглушка для создания гугл-таблицы."""
-    return "fake_spreadsheet_id"
+    return 'fake_spreadsheet_id'
 
 
 async def set_user_permissions(
@@ -47,7 +47,6 @@ async def set_user_permissions(
         wrapper_services: Aiogoogle
 ) -> None:
     """Заглушка для выдачи прав доступа."""
-    pass
 
 
 async def spreadsheets_update_value(
@@ -56,4 +55,3 @@ async def spreadsheets_update_value(
         wrapper_services: Aiogoogle
 ) -> None:
     """Заглушка для обновления таблицы с данными."""
-    pass
