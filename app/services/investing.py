@@ -36,17 +36,13 @@ async def create_new_investing(
     В ходе инвестирования объекты, полностью распределившие свои средства,
     помечаются как закрытые, а изменения сохраняются в БД.
     """
-    # Треб. сумм для проекта.
     full_amount = obj_db_project.full_amount
     close_date = datetime.now()
     for invest in obj_db_invest:
-        # Остаток свободной суммы пожертвования.
         free_sum = invest.full_amount - invest.invested_amount
-        # Остаток суммы проекта.
         remains_sum = full_amount - free_sum
         if remains_sum > 0:
             close_project_or_donat(invest, close_date)
-            # Заинвестировано.
             obj_db_project.invested_amount += full_amount - remains_sum
             full_amount = remains_sum
         elif remains_sum < 0:
