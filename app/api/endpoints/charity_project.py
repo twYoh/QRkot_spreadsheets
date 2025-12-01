@@ -97,7 +97,7 @@ async def partially_update_charity_project(
         3) session (AsyncSession): Асинхронная сессия работы с базой данных.
     """
     charity_project = await check_charity_project_exists(project_id, session)
-    await check_charity_project_before_edit(charity_project, obj_in)
+    check_charity_project_before_edit(charity_project, obj_in)
     if obj_in.name is not None:
         await check_name_duplicate(obj_in.name, session)
     charity_project = await charity_project_crud.update(
@@ -125,6 +125,6 @@ async def remove_charity_project(
         2) session: Асинхронная сессия взаимодействия с базой данных.
     """
     project = await check_charity_project_exists(project_id, session)
-    await check_charity_project_is_not_invested_or_closed(project)
+    check_charity_project_is_not_invested_or_closed(project)
     project = await charity_project_crud.remove(project, session)
     return project

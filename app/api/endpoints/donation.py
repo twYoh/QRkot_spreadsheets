@@ -6,7 +6,7 @@ from app.core.db import get_async_session
 from app.core.user import current_user, current_superuser
 from app.crud.donation import donation_crud
 from app.crud.charity_project import charity_project_crud
-from app.services.investing import create_new_investing
+from app.services.investing import investing
 from app.models import User
 from app.schemas.donation import DonationCreate, DonationtDB, AllDonationDB
 
@@ -67,10 +67,26 @@ async def make_a_donation(
         2) session (AsyncSession): Асинхронная сессия работы с базой данных;
         3) user (User): Текущий авторизованный пользователь.
     """
-    new_donation = await donation_crud.create(donation, session, user)
+    new_donation = await donation_crud.create(
+        donation,
+        session,
+        user,
+        commit=False
+    )
+    await session.flush()
+
     projects = await (
         charity_project_crud.get_open(session)
     )
-    if projects is not None:
-        await create_new_investing(new_donation, projects, session)
+
+    session.add_all(
+        investing(
+            new_donation,
+            projects
+        )
+    )
+
+    await session.commit()
+    await session.refresh(new_donation)
+
     return new_donation

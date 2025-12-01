@@ -1,5 +1,6 @@
 from aiogoogle import Aiogoogle
-from fastapi import APIRouter, Depends
+from aiogoogle.excs import HTTPError
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
@@ -39,11 +40,10 @@ async def get_project_report(
             projects,
             wrapper_services
         )
-    except Exception as e:
-        return {
-            "error": "Не удалось обновить данные таблицы",
-            "detail": str(e),
-            "url": spreadsheet_url
-        }
+    except HTTPError as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f'Ошибка при обновлении таблицы: {e}'
+        )
 
     return {"Google Sheet URL": spreadsheet_url}

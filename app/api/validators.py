@@ -49,7 +49,7 @@ async def check_charity_project_exists(
     return charity_project
 
 
-async def check_charity_project_before_edit(
+def check_charity_project_before_edit(
         charity_project: CharityProject,
         update_data: CharityProjectUpdate
 ) -> None:
@@ -75,7 +75,7 @@ async def check_charity_project_before_edit(
         )
 
 
-async def check_charity_project_is_not_invested_or_closed(
+def check_charity_project_is_not_invested_or_closed(
         charity_project: CharityProject
 ) -> None:
     """

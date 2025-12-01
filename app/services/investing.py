@@ -28,17 +28,3 @@ def investing(
             break
 
     return updated
-
-
-async def create_new_investing(
-    target,
-    sources,
-    session
-) -> None:
-    updated = investing(target, sources)
-
-    session.add(target)
-    session.add_all(updated)
-
-    await session.commit()
-    await session.refresh(target)
