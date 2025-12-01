@@ -69,7 +69,7 @@ async def make_a_donation(
     """
     new_donation = await donation_crud.create(donation, session, user)
     projects = await (
-        charity_project_crud.get_a_free_projects_or_dotanations(session)
+        charity_project_crud.get_open(session)
     )
     if projects is not None:
         await create_new_investing(new_donation, projects, session)

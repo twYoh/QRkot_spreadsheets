@@ -61,7 +61,7 @@ async def create_charity_project(
     await session.flush()
 
     donations = await (
-        donation_crud.get_a_free_projects_or_dotanations(session)
+        donation_crud.get_open(session)
     )
 
     session.add_all(

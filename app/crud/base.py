@@ -80,7 +80,7 @@ class CRUDBase:
         await session.commit()
         return db_obj
 
-    async def get_a_free_projects_or_dotanations(
+    async def get_open(
             self,
             session: AsyncSession
     ):
