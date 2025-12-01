@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.charity_project import charity_project_crud
@@ -24,7 +24,7 @@ async def check_name_duplicate(
     )
     if project_id is not None:
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail='Проект с таким именем уже существует!',
         )
 
@@ -43,7 +43,7 @@ async def check_charity_project_exists(
     charity_project = await charity_project_crud.get(project_id, session)
     if charity_project is None:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail='Проект не найден!'
         )
     return charity_project
@@ -64,17 +64,14 @@ async def check_charity_project_before_edit(
     """
     if charity_project.fully_invested:
         raise HTTPException(
-            status_code=400,
-            detail='Редактирование закрытого проекта недоступно!'
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Закрытый проект нельзя редактировать!'
         )
     if (update_data.full_amount and
        update_data.full_amount < charity_project.invested_amount):
         raise HTTPException(
-            status_code=422,
-            detail=(
-                'Запрошенная сумма не должна быть '
-                'меньше внесённых средств!'
-            ),
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail='Требуемая сумма не может быть меньше уже внесенной!'
         )
 
 
@@ -91,14 +88,11 @@ async def check_charity_project_is_not_invested_or_closed(
     """
     if charity_project.invested_amount:
         raise HTTPException(
-            status_code=400,
-            detail=(
-                'Проект нельзя удалить, '
-                'так как в него были сделаны взносы!'
-            ),
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Проект не подлежит удалению, в него внесены пожертвования!'
         )
     if charity_project.fully_invested:
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail='Удаление закрытых проектов запрещено!'
         )

@@ -53,6 +53,7 @@ async def create_charity_project(
         2) session: Асинхронная сессия взаимодействия с базой данных.
     """
     await check_name_duplicate(charity_project.name, session)
+
     project = await charity_project_crud.create(
         charity_project, session
     )
