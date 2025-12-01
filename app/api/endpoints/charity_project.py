@@ -14,7 +14,7 @@ from app.crud.donation import donation_crud
 from app.schemas.charity_project import (CharityProjectCreate,
                                          CharityProjectDB,
                                          CharityProjectUpdate)
-from app.services.investing import create_new_investing
+from app.services.investing import investing
 
 
 router = APIRouter()
@@ -55,13 +55,25 @@ async def create_charity_project(
     await check_name_duplicate(charity_project.name, session)
 
     project = await charity_project_crud.create(
-        charity_project, session
+        charity_project, session, commit=False
     )
-    free_donations = await (
+
+    await session.flush()
+
+    donations = await (
         donation_crud.get_a_free_projects_or_dotanations(session)
     )
-    if free_donations is not None:
-        await create_new_investing(project, free_donations, session)
+
+    session.add_all(
+        investing(
+            project,
+            donations
+        )
+    )
+
+    await session.commit()
+    await session.refresh(project)
+
     return project
 
 

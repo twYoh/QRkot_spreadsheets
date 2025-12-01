@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
-from app.core.constants import URL_GOOGLE_SHEETS
 from app.core.google_client import get_service
 from app.core.user import current_superuser
 from app.crud.charity_project import charity_project_crud
@@ -29,9 +28,22 @@ async def get_project_report(
     """
     projects = await charity_project_crud.get_projects_by_completion_rate(
         session)
-    spreadsheet_id = await spreadsheets_create(wrapper_services)
+
+    spreadsheet = await spreadsheets_create(wrapper_services)
+    spreadsheet_id = spreadsheet["spreadsheetId"]
+    spreadsheet_url = spreadsheet["spreadsheetUrl"]
     await set_user_permissions(spreadsheet_id, wrapper_services)
-    await spreadsheets_update_value(spreadsheet_id,
-                                    projects,
-                                    wrapper_services)
-    return {'Google Sheet URL': URL_GOOGLE_SHEETS + spreadsheet_id}
+    try:
+        await spreadsheets_update_value(
+            spreadsheet_id,
+            projects,
+            wrapper_services
+        )
+    except Exception as e:
+        return {
+            "error": "Не удалось обновить данные таблицы",
+            "detail": str(e),
+            "url": spreadsheet_url
+        }
+
+    return {"Google Sheet URL": spreadsheet_url}
