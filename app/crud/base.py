@@ -38,7 +38,8 @@ class CRUDBase:
             self,
             obj_in,
             session: AsyncSession,
-            user: Optional[User] = None
+            user: Optional[User] = None,
+            commit: bool = True,
     ):
         """Создать и занести запись модели в базу данных."""
         obj_in_data = obj_in.dict()
@@ -46,8 +47,10 @@ class CRUDBase:
             obj_in_data['user_id'] = user.id
         db_obj = self.model(**obj_in_data)
         session.add(db_obj)
-        await session.commit()
-        await session.refresh(db_obj)
+        if commit:
+            await session.commit()
+            await session.refresh(db_obj)
+
         return db_obj
 
     async def update(
@@ -85,9 +88,10 @@ class CRUDBase:
         Метод для проверки доступных в БД
         проектов или пожертвований.
         """
-        investion = await session.execute(
-            select(self.model).where(
-                self.model.fully_invested.is_(False)
-            ).order_by(self.model.id)
-        )
-        return investion.scalars().all()
+        return (
+            await session.execute(
+                select(self.model)
+                .where(self.model.fully_invested.is_(False))
+                .order_by(self.model.id)
+            )
+        ).scalars().all()
