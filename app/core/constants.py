@@ -4,6 +4,8 @@ MAX_LENGTH = 100
 MIN_LENGTH = 1
 DEFAULT_VALUE = 0
 FORMAT = '%Y/%m/%d %H:%M:%S'
+TABLE_ROW_COUNT = 100
+TABLE_COLUMN_COUNT = 11
 
 SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets',

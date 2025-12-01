@@ -1,51 +1,65 @@
 from datetime import datetime
+from copy import deepcopy
+
 from aiogoogle import Aiogoogle
 
 from app.core.config import settings
-from app.core.constants import FORMAT
+from app.core.constants import FORMAT, TABLE_ROW_COUNT, TABLE_COLUMN_COUNT
 
 
-def get_now_datetime_str() -> str:
-    return datetime.now().strftime({FORMAT})
+now_date_time = datetime.now().strftime(FORMAT)
+
+
+TABLE_HEADER = [
+    ['Отчёт от', ''],
+    ['Топ проектов по скорости завершения'],
+    ['Название проекта', 'Время сбора', 'Описание']
+]
+
+
+SPREADSHEET_BODY_TEMPLATE = dict(
+    properties=dict(
+        title='',
+        locale='ru_RU',
+    ),
+    sheets=[
+        dict(
+            properties=dict(
+                sheetType='GRID',
+                sheetId=0,
+                title='Лист1',
+                gridProperties=dict(
+                    rowCount=TABLE_ROW_COUNT,
+                    columnCount=TABLE_COLUMN_COUNT,
+                )
+            )
+        )
+    ]
+)
+
+
+PERMISSIONS_BODY = dict(
+    type='user',
+    role='writer',
+    emailAddress=settings.email
+)
 
 
 def build_spreadsheet_body() -> dict:
-    return {
-        'properties': {
-            'title': f'Отчёт на {get_now_datetime_str()}',
-            'locale': 'ru_RU'
-        },
-        'sheets': [{
-            'properties': {
-                'sheetType': 'GRID',
-                'sheetId': 0,
-                'title': 'Лист1',
-                'gridProperties': {
-                    'rowCount': 100,
-                    'columnCount': 11
-                }
-            }
-        }]
-    }
+    spreadsheet_body = deepcopy(SPREADSHEET_BODY_TEMPLATE)
+    spreadsheet_body['properties']['title'] = (
+        f"Отчёт на {datetime.now().strftime(FORMAT)}"
+    )
+    return spreadsheet_body
 
 
 def build_table_values() -> list[list[str]]:
-    return [
-        ['Отчёт от', get_now_datetime_str()],
-        ['Топ проектов по скорости завершения'],
-        ['Название проекта', 'Время сбора', 'Описание']
-    ]
-
-
-PERMISSIONS_BODY = {
-    'type': 'user',
-    'role': 'writer',
-    'emailAddress': settings.email
-}
+    table = deepcopy(TABLE_HEADER)
+    table[0][1] = now_date_time
+    return table
 
 
 async def convert_seconds_to_dhms(seconds: int) -> str:
-    """Конвертация секунд в формат дней/часов/минут/секунд."""
     days = seconds // (24 * 60 * 60)
     seconds -= days * (24 * 60 * 60)
     hours = seconds // (60 * 60)
@@ -59,19 +73,17 @@ async def convert_seconds_to_dhms(seconds: int) -> str:
 
 
 async def spreadsheets_create(wrapper_services: Aiogoogle) -> dict:
-    """Создание Google-таблицы."""
     service = await wrapper_services.discover('sheets', 'v4')
     spreadsheet = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=build_spreadsheet_body())
     )
-    return spreadsheet
+    return spreadsheet['spreadsheetId'], spreadsheet['spreadsheetUrl']
 
 
 async def set_user_permissions(
     spreadsheet_id: str,
     wrapper_services: Aiogoogle
 ) -> None:
-    """Выдача доступа к таблице по email."""
     service = await wrapper_services.discover('drive', 'v3')
     await wrapper_services.as_service_account(
         service.permissions.create(
@@ -87,26 +99,30 @@ async def spreadsheets_update_value(
     projects: list,
     wrapper_services: Aiogoogle
 ) -> None:
-    """Запись данных в таблицу отчёта."""
     service = await wrapper_services.discover('sheets', 'v4')
     table_values = [
         *build_table_values(),
         *[list(map(str, project)) for project in projects]
     ]
 
-    for values in table_values[3:]:
-        if values[1] and values[1].isdigit():
-            values[1] = await convert_seconds_to_dhms(int(values[1]))
+    if len(table_values) > TABLE_ROW_COUNT:
+        raise ValueError('Слишком много строк для таблицы')
+
+    for row in table_values:
+        if len(row) > TABLE_COLUMN_COUNT:
+            raise ValueError('Слишком много столбцов для таблицы')
 
     update_body = {
         'majorDimension': 'ROWS',
         'values': table_values
     }
 
+    range_notation = f'R1C1:R{len(table_values)}C{TABLE_COLUMN_COUNT}'
+
     await wrapper_services.as_service_account(
         service.spreadsheets.values.update(
             spreadsheetId=spreadsheet_id,
-            range=f'A1:C{len(table_values)}',
+            range=range_notation,
             valueInputOption='USER_ENTERED',
             json=update_body
         )
