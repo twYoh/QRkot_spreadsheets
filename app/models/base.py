@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Integer,  CheckConstraint
+from sqlalchemy import Boolean, Column, DateTime, Integer, CheckConstraint
 
 from app.core.db import Base
 from app.core.constants import DEFAULT_VALUE
