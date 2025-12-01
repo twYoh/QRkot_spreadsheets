@@ -13,12 +13,11 @@ class CRUDDonation(CRUDBase):
             user: User
     ) -> list[Donation]:
         """Получить перечень всех пожертвований пользователя."""
-        user_donation = await session.execute(
-            select(Donation).where(
-                Donation.user_id == user.id
+        return (
+            await session.execute(
+                select(Donation).where(Donation.user_id == user.id)
             )
-        )
-        return user_donation.scalars().all()
+        ).scalars().all()
 
 
 donation_crud = CRUDDonation(Donation)

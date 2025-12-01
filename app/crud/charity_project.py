@@ -15,12 +15,11 @@ class CRUDCharityProject(CRUDBase):
             session: AsyncSession
     ) -> Optional[int]:
         """Получить проект по имени."""
-        project_id = await session.execute(
-            select(self.model.id).where(
-                self.model.name == project_name
+        return (
+            await session.execute(
+                select(self.model.id).where(self.model.name == project_name)
             )
-        )
-        return project_id.scalars().first()
+        ).scalars().first()
 
     async def get_projects_by_completion_rate(
             self,
