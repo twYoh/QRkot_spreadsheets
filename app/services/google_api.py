@@ -118,11 +118,6 @@ async def spreadsheets_update_value(
                 f'{len(row)} из {TABLE_COLUMN_COUNT}'
             )
 
-    update_body = {
-        'majorDimension': 'ROWS',
-        'values': table_values
-    }
-
     await wrapper_services.as_service_account(
         service.spreadsheets.values.update(
             spreadsheetId=spreadsheet_id,
@@ -131,6 +126,9 @@ async def spreadsheets_update_value(
                 f'{max(len(row) for row in table_values)}'
             ),
             valueInputOption='USER_ENTERED',
-            json=update_body
+            json={
+                'majorDimension': 'ROWS',
+                'values': table_values
+            }
         )
     )
