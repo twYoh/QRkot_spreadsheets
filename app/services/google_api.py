@@ -106,23 +106,30 @@ async def spreadsheets_update_value(
     ]
 
     if len(table_values) > TABLE_ROW_COUNT:
-        raise ValueError('Слишком много строк для таблицы')
+        raise ValueError(
+            'Слишком много строк для таблицы: '
+            f'{len(table_values)} из {TABLE_ROW_COUNT}'
+        )
 
     for row in table_values:
         if len(row) > TABLE_COLUMN_COUNT:
-            raise ValueError('Слишком много столбцов для таблицы')
+            raise ValueError(
+                'Слишком много столбцов в строке: '
+                f'{len(row)} из {TABLE_COLUMN_COUNT}'
+            )
 
     update_body = {
         'majorDimension': 'ROWS',
         'values': table_values
     }
 
-    range_notation = f'R1C1:R{len(table_values)}C{TABLE_COLUMN_COUNT}'
-
     await wrapper_services.as_service_account(
         service.spreadsheets.values.update(
             spreadsheetId=spreadsheet_id,
-            range=range_notation,
+            range=(
+                f'R1C1:R{len(table_values)}C'
+                f'{max(len(row) for row in table_values)}'
+            ),
             valueInputOption='USER_ENTERED',
             json=update_body
         )
